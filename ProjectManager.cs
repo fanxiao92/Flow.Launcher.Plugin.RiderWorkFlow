@@ -34,8 +34,19 @@ public class ProjectManager
         var names = xmlDoc.Descendants("entry")
             .Select(e => new ProjectModel{ ProjectPath = e.Attribute("key")!.Value })
             .Where(e => e.Name.ToLower().Contains(projectName.ToLower())).ToList();
-        
-        return names;
+        var result = new List<ProjectModel>();
+        foreach (var name in names)
+        {
+            if (name.ProjectPath.StartsWith("$USER_HOME$"))
+            {
+               result.Add(new ProjectModel() { ProjectPath = "C:/Users/xiaofan" + name.ProjectPath.Substring(11) }); 
+            }
+            else
+            {
+                result.Add(name);
+            }
+        }
+        return result;
     }
     
     private static bool OpenProject(string solutionPath)
@@ -59,13 +70,14 @@ public class ProjectManager
 
     private string GetOptionPath()
     {
-        var applicationDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\JetBrains\";
-        const string optionsFilePath = @"\options\recentSolutions.xml";
-        
-        var riderVersion = Directory.GetDirectories(applicationDataFolder)
-            .Select(Path.GetFileName)
-            .FirstOrDefault(e => e != null && e.ToLower().Contains(IDEName));
-        
-        return applicationDataFolder + riderVersion + optionsFilePath;
+        return @"C:\Scoop\persist\rider\profile\config\options\recentSolutions.xml";
+        // var applicationDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\JetBrains\";
+        // const string optionsFilePath = @"\options\recentSolutions.xml";
+        //
+        // var riderVersion = Directory.GetDirectories(applicationDataFolder)
+        //     .Select(Path.GetFileName)
+        //     .FirstOrDefault(e => e != null && e.ToLower().Contains(IDEName));
+        //
+        // return applicationDataFolder + riderVersion + optionsFilePath;
     }
 }
